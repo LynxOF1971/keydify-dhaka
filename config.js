@@ -130,6 +130,38 @@ window.KEYDIFY = {
       "description": "A personalised name keyring with glow details, stars and hearts. Tell us your name and preferred colours; we’ll confirm the available designs in chat.",
       "price": "Ask for a quote",
       "image": "assets/spooky.jpg"
+    },
+    {
+      "id": "personalised-01",
+      "name": "Custom Character Keyrings",
+      "category": "personalised",
+      "description": "Personalised character and name designs. Tell us your chosen design, name and colours in chat.",
+      "price": "Ask for a quote",
+      "image": "assets/made-personal.png"
+    },
+    {
+      "id": "corporate-order-01",
+      "name": "Corporate Logo Keyrings",
+      "category": "corporate-order",
+      "description": "Custom keyrings for your company, team or event. Share your logo, quantity and deadline so we can prepare a quote.",
+      "price": "Ask for a quote",
+      "image": "assets/corporate-order.jpg"
+    },
+    {
+      "id": "originals-01",
+      "name": "Everyday Name Keyrings",
+      "category": "originals",
+      "description": "Personalised name designs with hearts, stars or floral details. Tell us which design and colours you would like.",
+      "price": "Ask for a quote",
+      "image": "assets/everyday-originals.jpeg"
+    },
+    {
+      "id": "fidget-toys-01",
+      "name": "Fidget Toys",
+      "category": "fidget-toys",
+      "description": "Explore the fidget designs pictured. Tell us which design and colour you would like; we’ll confirm availability and pricing in chat.",
+      "price": "Ask for a quote",
+      "image": "assets/fidget-toys.png"
     }
   ]
 };

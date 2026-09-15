@@ -7,6 +7,7 @@ let activeCategory = 'all';
 let slideIndex = 0;
 let paused = reducedMotion;
 const dialog = $('#order-dialog');
+const categoryDialog = $('#category-dialog');
 const textElement = (tag, text, className) => { const el = document.createElement(tag); el.textContent = text; if (className) el.className = className; return el; };
 $('#year').textContent = new Date().getFullYear();
 $('#preview-notice').hidden = !config.previewMode;
@@ -35,24 +36,29 @@ function renderProducts(category = activeCategory) {
   $('#sort-note').hidden = order === 'featured' || !missing;
   $('#sort-note').textContent = order === 'popular' ? 'Designs without popularity data appear last.' : 'Designs with prices available on request appear last.';
   $('#empty-state').hidden = products.length > 0;
+  renderProductCards(products, $('#product-grid'));
+}
+function renderProductCards(products, container) {
+  container.replaceChildren();
   products.forEach(product => {
     const card = textElement('article', '', 'product-card');
-    const visual = textElement('div', '', 'product-image');
+    const visual = textElement('button', '', 'product-image product-image-button');
+    visual.type = 'button'; visual.setAttribute('aria-label', `Choose ${product.name}`); visual.addEventListener('click', () => openOrder(product));
     const img = document.createElement('img'); img.src = product.image; img.alt = config.previewMode ? 'Brand artwork — product photo pending' : product.name; img.loading = 'lazy';
-    const button = textElement('button', '↗'); button.setAttribute('aria-label', `Choose ${product.name}`); button.addEventListener('click', () => openOrder(product));
+    const button = textElement('span', '↗', 'product-order-arrow'); button.setAttribute('aria-hidden', 'true');
     visual.append(img, textElement('span', config.previewMode ? 'SAMPLE CONCEPT' : 'KEYDIFY DHAKA', 'badge'), button);
     const meta = textElement('div', '', 'product-meta'); const info = document.createElement('div');
     const nameButton = textElement('button', product.name); nameButton.style.cssText = 'border:0;background:none;padding:0;text-align:left;font-weight:600'; nameButton.addEventListener('click', () => openOrder(product));
     const heading = document.createElement('h3'); heading.append(nameButton);
     info.append(heading, textElement('p', config.categories.find(c => c.id === product.category)?.name || 'Collection'));
-    meta.append(info, textElement('span', product.price)); card.append(visual, meta); $('#product-grid').append(card);
+    meta.append(info, textElement('span', product.price)); card.append(visual, meta); container.append(card);
   });
 }
 config.categories.forEach(category => {
   const button = textElement('button', '', 'category-card');
   button.type = 'button'; button.dataset.category = category.id;
   button.setAttribute('aria-pressed', 'false');
-  button.setAttribute('aria-controls', 'product-grid');
+  button.setAttribute('aria-controls', 'category-dialog'); button.setAttribute('aria-haspopup', 'dialog');
   const visual = textElement('span', '', 'category-card-image');
   const img = document.createElement('img');
   img.src = category.image || 'assets/keydify-brand.jpeg'; img.alt = ''; img.loading = 'lazy';
@@ -62,18 +68,33 @@ config.categories.forEach(category => {
   details.append(textElement('strong', category.name), textElement('span', category.description));
   button.append(visual, details);
   button.addEventListener('click', () => {
-    renderProducts(category.id);
-    $('#collection-results').scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth' });
+    openCategory(category);
   });
   $('#filters').append(button);
 });
 $('#product-sort').addEventListener('change', () => renderProducts());
 $('#show-all').addEventListener('click', () => renderProducts('all'));
+function openCategory(category) {
+  const products = sortProducts(config.products.filter(p => p.category === category.id || p.categories?.includes(category.id)), $('#product-sort').value);
+  $('#category-title').textContent = category.name;
+  $('#category-description').textContent = category.description;
+  $('#category-count').textContent = `${products.length} ${products.length === 1 ? 'design' : 'designs'} — choose an image to order`;
+  $('#category-empty').hidden = products.length > 0;
+  renderProductCards(products, $('#category-products'));
+  categoryDialog.showModal(); document.body.classList.add('modal-open');
+}
+$('#close-category').addEventListener('click', () => categoryDialog.close());
+categoryDialog.addEventListener('close', () => { if (!dialog.open) document.body.classList.remove('modal-open'); });
+categoryDialog.addEventListener('click', event => {
+  if (event.target !== categoryDialog) return;
+  const r = categoryDialog.getBoundingClientRect();
+  if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) categoryDialog.close();
+});
 function openOrder(product) {
   selectedProduct = product; $('#order-title').textContent = product.name; $('#order-description').textContent = product.description; $('#order-price').textContent = product.price; $('#order-form').reset(); $('#order-status').textContent = ''; dialog.showModal(); document.body.classList.add('modal-open');
 }
 $('.close-dialog').addEventListener('click', () => dialog.close());
-dialog.addEventListener('close', () => document.body.classList.remove('modal-open'));
+dialog.addEventListener('close', () => { if (!categoryDialog.open) document.body.classList.remove('modal-open'); });
 dialog.addEventListener('click', event => { if (event.target === dialog) { const r = dialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) dialog.close(); } });
 function orderMessage() {
   return `Hi KeyDify Dhaka! I’m interested in ${selectedProduct.name} (${selectedProduct.id}).\nCustomer name: ${$('#customer-name').value.trim()}\nQuantity: ${$('#quantity').value}\n${$('#customisation').value.trim() ? `Personalisation: ${$('#customisation').value.trim()}\n` : ''}Please confirm the available options, total price and delivery.${config.previewMode ? '\nI saw this sample concept on your website.' : ''}`;
@@ -116,7 +137,7 @@ function showSlide(index) {
 function updatePause() { $('#pause-slide').textContent = paused ? '▶' : 'Ⅱ'; $('#pause-slide').setAttribute('aria-label', paused ? 'Play slideshow' : 'Pause slideshow'); const video = $('.showcase-media>video'); if (video) { if (paused) video.pause(); else video.play().catch(() => {}); } }
 $('#prev-slide').addEventListener('click', () => showSlide(slideIndex - 1)); $('#next-slide').addEventListener('click', () => showSlide(slideIndex + 1)); $('#pause-slide').addEventListener('click', () => { paused = !paused; updatePause(); });
 let hoverPause = false; $('.hero-art').addEventListener('mouseenter', () => hoverPause = true); $('.hero-art').addEventListener('mouseleave', () => hoverPause = false);
-setInterval(() => { if (!paused && !hoverPause && !document.hidden && !dialog.open && !$('.hero-art').contains(document.activeElement)) showSlide(slideIndex + 1); }, 1500);
+setInterval(() => { if (!paused && !hoverPause && !document.hidden && !dialog.open && !categoryDialog.open && !$('.hero-art').contains(document.activeElement)) showSlide(slideIndex + 1); }, 1500);
 $('#showcase-product').addEventListener('click', () => {
   const product = config.products.find(p => p.id === config.slides[slideIndex]?.productId);
   if (product) openOrder(product);
