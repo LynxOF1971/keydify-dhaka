@@ -1,7 +1,7 @@
 /* Store settings and product catalogue. Prices are confirmed in chat. */
 window.KEYDIFY = {
   "whatsapp": "8801704184090",
-  "messenger": "",
+  "messenger": "keydify.dhaka",
   "previewMode": false,
   "slides": [
     {
