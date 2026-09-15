@@ -1,5 +1,4 @@
-/* Store contact details, categories, products and linked slideshow images.
-   Prices are confirmed in chat. Add numeric priceAmount (BDT) and popularity values when available. */
+/* Store settings and product catalogue. Prices are confirmed in chat. */
 window.KEYDIFY = {
   "whatsapp": "8801704184090",
   "messenger": "",
@@ -63,25 +62,25 @@ window.KEYDIFY = {
       "id": "corporate-order",
       "name": "Corporate Order",
       "description": "Custom enquiries for your team, brand or event.",
-      "image": "assets/keydify-brand.jpeg"
+      "image": "assets/corporate-order.jpg"
     },
     {
       "id": "personalised",
       "name": "Made personal",
       "description": "Names, initials, and a little bit of you.",
-      "image": "assets/bagtag.jpeg"
+      "image": "assets/made-personal.png"
     },
     {
       "id": "originals",
       "name": "Everyday originals",
       "description": "Small details with their own personality.",
-      "image": "assets/clicky.png"
+      "image": "assets/everyday-originals.jpeg"
     },
     {
-      "id": "gifts",
-      "name": "Thoughtful gifts",
-      "description": "A little something for someone special.",
-      "image": "assets/spooky.jpg"
+      "id": "fidget-toys",
+      "name": "Fidget Toys",
+      "description": "Colourful designs to twist, turn and fidget with.",
+      "image": "assets/fidget-toys.png"
     }
   ],
   "products": [
@@ -90,8 +89,7 @@ window.KEYDIFY = {
       "name": "Personalised Bagtag",
       "category": "bagtag",
       "categories": [
-        "personalised",
-        "gifts"
+        "personalised"
       ],
       "description": "A personalised tag for your bag, featuring your name or social handle. Tell us the text and colours you would like; we’ll confirm the available options in chat.",
       "price": "Ask for a quote",
@@ -103,8 +101,7 @@ window.KEYDIFY = {
       "category": "clicky",
       "categories": [
         "personalised",
-        "originals",
-        "gifts"
+        "originals"
       ],
       "description": "Colourful keycap-style name keyrings. Share your name, preferred colours and any symbol you would like, and we’ll confirm your design in chat.",
       "price": "Ask for a quote",
@@ -116,8 +113,7 @@ window.KEYDIFY = {
       "category": "nfc",
       "categories": [
         "personalised",
-        "originals",
-        "gifts"
+        "originals"
       ],
       "description": "A personalised NFC keyring with your name and social design. Tell us the link you want to use and ask us about setup and device compatibility before ordering.",
       "price": "Ask for a quote",
@@ -129,8 +125,7 @@ window.KEYDIFY = {
       "category": "spooky",
       "categories": [
         "personalised",
-        "originals",
-        "gifts"
+        "originals"
       ],
       "description": "A personalised name keyring with glow details, stars and hearts. Tell us your name and preferred colours; we’ll confirm the available designs in chat.",
       "price": "Ask for a quote",
