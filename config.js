@@ -93,10 +93,10 @@ window.KEYDIFY = {
         "originals"
       ],
       "description": "Colourful keycap-style name keyrings. Share your name, preferred colours and any symbol you would like, and we’ll confirm your design in chat.",
-      "price": "৳250",
+      "price": "৳1",
       "image": "assets/clicky.png",
-      "priceAmount": 250,
-      "popularity": 5
+      "popularity": 5,
+      "priceAmount": 1
     },
     {
       "id": "nfc-01",
@@ -107,9 +107,8 @@ window.KEYDIFY = {
         "originals"
       ],
       "description": "A personalised NFC keyring with your name and social design. Tell us the link you want to use and ask us about setup and device compatibility before ordering.",
-      "price": "৳360",
-      "image": "assets/nfc.png",
-      "priceAmount": 360
+      "price": "Ask for a quote",
+      "image": "assets/nfc.png"
     },
     {
       "id": "spooky-01",
@@ -120,9 +119,8 @@ window.KEYDIFY = {
         "originals"
       ],
       "description": "A personalised name keyring with glow details, stars and hearts. Tell us your name and preferred colours; we’ll confirm the available designs in chat.",
-      "price": "৳294",
-      "image": "assets/spooky.jpg",
-      "priceAmount": 294
+      "price": "Ask for a quote",
+      "image": "assets/spooky.jpg"
     },
     {
       "id": "corporate-order-01",
@@ -155,9 +153,8 @@ window.KEYDIFY = {
         "personalised"
       ],
       "description": "A personalised tag for your bag, featuring your name or social handle. Tell us the text and colours you would like; we’ll confirm the available options in chat.",
-      "price": "৳140",
+      "price": "Ask for a quote",
       "image": "assets/bagtag.jpeg",
-      "priceAmount": 140,
       "popularity": 1
     },
     {
@@ -165,9 +162,8 @@ window.KEYDIFY = {
       "name": "Everyday Name Keyrings",
       "category": "originals",
       "description": "Personalised name designs with hearts, stars or floral details. Tell us which design and colours you would like.",
-      "price": "৳200",
-      "image": "assets/everyday-originals.jpeg",
-      "priceAmount": 200
+      "price": "Ask for a quote",
+      "image": "assets/everyday-originals.jpeg"
     },
     {
       "id": "fidget-toys-01",
