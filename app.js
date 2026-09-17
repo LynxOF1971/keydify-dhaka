@@ -91,7 +91,7 @@ categoryDialog.addEventListener('click', event => {
   if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) categoryDialog.close();
 });
 function openOrder(product) {
-  selectedProduct = product; $('#order-title').textContent = product.name; $('#order-description').textContent = product.description; $('#order-price').textContent = product.price; $('#order-form').reset(); $('#order-status').textContent = ''; dialog.showModal(); document.body.classList.add('modal-open');
+  selectedProduct = product; const gallery = $('#order-gallery'); gallery.replaceChildren(); [product.image, ...(product.images || [])].filter(Boolean).forEach((src, index) => { const image = document.createElement('img'); image.src = src; image.alt = `${product.name} — photo ${index + 1}`; image.loading = 'lazy'; gallery.append(image); }); $('#order-title').textContent = product.name; $('#order-description').textContent = product.description; $('#order-price').textContent = product.price; $('#order-form').reset(); $('#order-status').textContent = ''; dialog.showModal(); document.body.classList.add('modal-open');
 }
 $('.close-dialog').addEventListener('click', () => dialog.close());
 dialog.addEventListener('close', () => { if (!categoryDialog.open) document.body.classList.remove('modal-open'); });
@@ -120,7 +120,7 @@ $('#order-form').addEventListener('submit', event => { event.preventDefault(); i
 $('#copy-order').addEventListener('click', () => { if ($('#order-form').reportValidity()) copyMessage(orderMessage(), $('#order-status')); });
 document.querySelectorAll('[data-contact]').forEach(button => button.addEventListener('click', () => { selectedProduct = null; handoff(button.dataset.contact, 'Hi KeyDify Dhaka! I’d like to ask about your products.', $('#contact-status')); }));
 function showSlide(index) {
-  const slides = config.slides; if (!slides.length) return;
+  const slides = config.slides; if (!slides.length) { $('.hero-art').hidden = true; return; }
   slideIndex = (index + slides.length) % slides.length; const slide = slides[slideIndex];
   const old = $('.showcase-media>img, .showcase-media>video');
   const media = document.createElement(slide.type === 'video' ? 'video' : 'img'); media.src = slide.src;
