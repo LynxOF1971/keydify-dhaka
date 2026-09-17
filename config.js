@@ -1,16 +1,9 @@
-/* Store settings and product catalogue. Prices are confirmed in chat. */
+/* Edited in KeyDify Studio */
 window.KEYDIFY = {
   "whatsapp": "8801704184090",
   "messenger": "keydify.dhaka",
   "previewMode": false,
   "slides": [
-    {
-      "type": "image",
-      "src": "assets/bagtag.jpeg",
-      "productId": "bagtag-01",
-      "label": "01 / BAGTAG",
-      "alt": "Personalised Bagtag"
-    },
     {
       "type": "image",
       "src": "assets/clicky.png",
@@ -31,6 +24,13 @@ window.KEYDIFY = {
       "productId": "spooky-01",
       "label": "04 / SPOOKY",
       "alt": "Spooky at Night Keyring"
+    },
+    {
+      "type": "image",
+      "src": "assets/upload-2230cdba-a5ef-44cc-ab23-01529052b661.jpg",
+      "productId": "bagtag-01",
+      "label": "01 / BAGTAG",
+      "alt": "Personalised Bagtag"
     }
   ],
   "categories": [
@@ -85,17 +85,6 @@ window.KEYDIFY = {
   ],
   "products": [
     {
-      "id": "bagtag-01",
-      "name": "Personalised Bagtag",
-      "category": "bagtag",
-      "categories": [
-        "personalised"
-      ],
-      "description": "A personalised tag for your bag, featuring your name or social handle. Tell us the text and colours you would like; we’ll confirm the available options in chat.",
-      "price": "Ask for a quote",
-      "image": "assets/bagtag.jpeg"
-    },
-    {
       "id": "clicky-01",
       "name": "Clicky Name Keyring",
       "category": "clicky",
@@ -104,8 +93,10 @@ window.KEYDIFY = {
         "originals"
       ],
       "description": "Colourful keycap-style name keyrings. Share your name, preferred colours and any symbol you would like, and we’ll confirm your design in chat.",
-      "price": "Ask for a quote",
-      "image": "assets/clicky.png"
+      "price": "৳250",
+      "image": "assets/clicky.png",
+      "priceAmount": 250,
+      "popularity": 5
     },
     {
       "id": "nfc-01",
@@ -116,8 +107,9 @@ window.KEYDIFY = {
         "originals"
       ],
       "description": "A personalised NFC keyring with your name and social design. Tell us the link you want to use and ask us about setup and device compatibility before ordering.",
-      "price": "Ask for a quote",
-      "image": "assets/nfc.png"
+      "price": "৳360",
+      "image": "assets/nfc.png",
+      "priceAmount": 360
     },
     {
       "id": "spooky-01",
@@ -128,32 +120,54 @@ window.KEYDIFY = {
         "originals"
       ],
       "description": "A personalised name keyring with glow details, stars and hearts. Tell us your name and preferred colours; we’ll confirm the available designs in chat.",
-      "price": "Ask for a quote",
-      "image": "assets/spooky.jpg"
-    },
-    {
-      "id": "personalised-01",
-      "name": "Custom Character Keyrings",
-      "category": "personalised",
-      "description": "Personalised character and name designs. Tell us your chosen design, name and colours in chat.",
-      "price": "Ask for a quote",
-      "image": "assets/made-personal.png"
+      "price": "৳294",
+      "image": "assets/spooky.jpg",
+      "priceAmount": 294
     },
     {
       "id": "corporate-order-01",
       "name": "Corporate Logo Keyrings",
       "category": "corporate-order",
       "description": "Custom keyrings for your company, team or event. Share your logo, quantity and deadline so we can prepare a quote.",
-      "price": "Ask for a quote",
-      "image": "assets/corporate-order.jpg"
+      "price": "৳60",
+      "image": "assets/corporate-order.jpg",
+      "priceAmount": 60
+    },
+    {
+      "id": "personalised-01",
+      "name": "Custom Creative  Keyrings",
+      "category": "personalised",
+      "description": "Personalised character and name designs. Tell us your chosen design, name and colours in chat.",
+      "price": "৳200",
+      "image": "assets/upload-cad2221a-3d21-48f6-946f-0a41822278ad.png",
+      "priceAmount": 200,
+      "images": [
+        "assets/upload-e57ae569-e03d-401b-abdf-bcddf945b3c9.jpg",
+        "assets/upload-0d53b52c-8ac0-47b0-98b5-a59f301d3180.jpg",
+        "assets/upload-8a9b99ff-e057-41cc-9d94-0a0315ccbe0d.jpg"
+      ]
+    },
+    {
+      "id": "bagtag-01",
+      "name": "Personalised Bagtag",
+      "category": "bagtag",
+      "categories": [
+        "personalised"
+      ],
+      "description": "A personalised tag for your bag, featuring your name or social handle. Tell us the text and colours you would like; we’ll confirm the available options in chat.",
+      "price": "৳140",
+      "image": "assets/bagtag.jpeg",
+      "priceAmount": 140,
+      "popularity": 1
     },
     {
       "id": "originals-01",
       "name": "Everyday Name Keyrings",
       "category": "originals",
       "description": "Personalised name designs with hearts, stars or floral details. Tell us which design and colours you would like.",
-      "price": "Ask for a quote",
-      "image": "assets/everyday-originals.jpeg"
+      "price": "৳200",
+      "image": "assets/everyday-originals.jpeg",
+      "priceAmount": 200
     },
     {
       "id": "fidget-toys-01",
@@ -163,5 +177,9 @@ window.KEYDIFY = {
       "price": "Ask for a quote",
       "image": "assets/fidget-toys.png"
     }
-  ]
+  ],
+  "site": {
+    "text": {},
+    "media": {}
+  }
 };
