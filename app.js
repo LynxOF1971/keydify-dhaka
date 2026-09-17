@@ -40,11 +40,12 @@ function renderProducts(category = activeCategory) {
 }
 function renderProductCards(products, container) {
   container.replaceChildren();
-  products.forEach(product => {
+  const photos = products.flatMap(product => [...new Set([product.image, ...(product.images || [])].filter(Boolean))].map(src => ({ ...product, galleryImage: src })));
+  photos.forEach(product => {
     const card = textElement('article', '', 'product-card');
     const visual = textElement('button', '', 'product-image product-image-button');
     visual.type = 'button'; visual.setAttribute('aria-label', `Choose ${product.name}`); visual.addEventListener('click', () => openOrder(product));
-    const img = document.createElement('img'); img.src = product.image; img.alt = config.previewMode ? 'Brand artwork — product photo pending' : product.name; img.loading = 'lazy';
+    const img = document.createElement('img'); img.src = product.galleryImage || product.image; img.alt = config.previewMode ? 'Brand artwork — product photo pending' : product.name; img.loading = 'lazy';
     const button = textElement('span', '↗', 'product-order-arrow'); button.setAttribute('aria-hidden', 'true');
     visual.append(img, textElement('span', config.previewMode ? 'SAMPLE CONCEPT' : 'KEYDIFY DHAKA', 'badge'), button);
     const meta = textElement('div', '', 'product-meta'); const info = document.createElement('div');
@@ -91,7 +92,7 @@ categoryDialog.addEventListener('click', event => {
   if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) categoryDialog.close();
 });
 function openOrder(product) {
-  selectedProduct = product; const gallery = $('#order-gallery'); gallery.replaceChildren(); [product.image, ...(product.images || [])].filter(Boolean).forEach((src, index) => { const image = document.createElement('img'); image.src = src; image.alt = `${product.name} — photo ${index + 1}`; image.loading = 'lazy'; gallery.append(image); }); $('#order-title').textContent = product.name; $('#order-description').textContent = product.description; $('#order-price').textContent = product.price; $('#order-form').reset(); $('#order-status').textContent = ''; dialog.showModal(); document.body.classList.add('modal-open');
+  selectedProduct = product; const gallery = $('#order-gallery'); gallery.replaceChildren(); [...new Set([product.galleryImage, product.image, ...(product.images || [])].filter(Boolean))].forEach((src, index) => { const image = document.createElement('img'); image.src = src; image.alt = `${product.name} — photo ${index + 1}`; image.loading = 'lazy'; gallery.append(image); }); $('#order-title').textContent = product.name; $('#order-description').textContent = product.description; $('#order-price').textContent = product.price; $('#order-form').reset(); $('#order-status').textContent = ''; dialog.showModal(); document.body.classList.add('modal-open');
 }
 $('.close-dialog').addEventListener('click', () => dialog.close());
 dialog.addEventListener('close', () => { if (!categoryDialog.open) document.body.classList.remove('modal-open'); });
