@@ -3,7 +3,6 @@ const config = window.KEYDIFY;
 const $ = selector => document.querySelector(selector);
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 let selectedProduct = null;
-let activeCategory = 'all';
 let slideIndex = 0;
 let paused = reducedMotion;
 const dialog = $('#order-dialog');
@@ -11,33 +10,6 @@ const categoryDialog = $('#category-dialog');
 const textElement = (tag, text, className) => { const el = document.createElement(tag); el.textContent = text; if (className) el.className = className; return el; };
 $('#year').textContent = new Date().getFullYear();
 $('#preview-notice').hidden = !config.previewMode;
-function sortProducts(products, order) {
-  const key = order === 'popular' ? 'popularity' : 'priceAmount';
-  const valid = value => typeof value === 'number' && Number.isFinite(value) && value >= 0;
-  if (order === 'featured') return [...products];
-  return [...products].sort((a, b) => {
-    const av = a[key], bv = b[key];
-    if (!valid(av)) return valid(bv) ? 1 : 0;
-    if (!valid(bv)) return -1;
-    return order === 'price-asc' ? av - bv : bv - av;
-  });
-}
-function renderProducts(category = activeCategory) {
-  activeCategory = category;
-  $('#product-grid').replaceChildren();
-  document.querySelectorAll('.category-card').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.category === category)));
-  const order = $('#product-sort').value;
-  const products = sortProducts(config.products.filter(p => category === 'all' || (p.category === category || p.categories?.includes(category))), order);
-  $('#results-title').textContent = config.categories.find(c => c.id === category)?.name || 'All designs';
-  $('#result-count').textContent = `${products.length} ${products.length === 1 ? 'design' : 'designs'}`;
-  $('#show-all').hidden = category === 'all';
-  const key = order === 'popular' ? 'popularity' : 'priceAmount';
-  const missing = products.some(p => typeof p[key] !== 'number' || !Number.isFinite(p[key]) || p[key] < 0);
-  $('#sort-note').hidden = order === 'featured' || !missing;
-  $('#sort-note').textContent = order === 'popular' ? 'Designs without popularity data appear last.' : 'Designs with prices available on request appear last.';
-  $('#empty-state').hidden = products.length > 0;
-  renderProductCards(products, $('#product-grid'));
-}
 function renderProductCards(products, container) {
   container.replaceChildren();
   const photos = products.flatMap(product => [...new Set([product.image, ...(product.images || [])].filter(Boolean))].map(src => ({ ...product, galleryImage: src })));
@@ -73,10 +45,8 @@ config.categories.forEach(category => {
   });
   $('#filters').append(button);
 });
-$('#product-sort').addEventListener('change', () => renderProducts());
-$('#show-all').addEventListener('click', () => renderProducts('all'));
 function openCategory(category) {
-  const products = sortProducts(config.products.filter(p => p.category === category.id || p.categories?.includes(category.id)), $('#product-sort').value);
+  const products = config.products.filter(p => p.category === category.id || p.categories?.includes(category.id));
   $('#category-title').textContent = category.name;
   $('#category-description').textContent = category.description;
   $('#category-count').textContent = `${products.length} ${products.length === 1 ? 'design' : 'designs'} — choose an image to order`;
@@ -162,4 +132,4 @@ $('#showcase-product').addEventListener('click', () => {
   if (product) openOrder(product);
   else $('#collection').scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth' });
 });
-renderProducts(); showSlide(0); updatePause();
+showSlide(0); updatePause();

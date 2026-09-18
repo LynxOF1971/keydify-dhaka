@@ -53,34 +53,28 @@ window.KEYDIFY = {
       "image": "assets/nfc.png"
     },
     {
+      "id": "personalised",
+      "name": "Custom Creative",
+      "description": "Names, initials, and a little bit of you.",
+      "image": "assets/made-personal.png"
+    },
+    {
       "id": "bagtag",
       "name": "Bagtag",
       "description": "Give your bag a personal touch.",
       "image": "assets/bagtag.jpeg"
     },
     {
-      "id": "corporate-order",
-      "name": "Corporate Order",
-      "description": "Custom enquiries for your team, brand or event.",
-      "image": "assets/corporate-order.jpg"
-    },
-    {
-      "id": "personalised",
-      "name": "Made personal",
-      "description": "Names, initials, and a little bit of you.",
-      "image": "assets/made-personal.png"
-    },
-    {
-      "id": "originals",
-      "name": "Everyday originals",
-      "description": "Small details with their own personality.",
-      "image": "assets/everyday-originals.jpeg"
-    },
-    {
       "id": "fidget-toys",
-      "name": "Fidget Toys",
+      "name": "Fidget",
       "description": "Colourful designs to twist, turn and fidget with.",
       "image": "assets/fidget-toys.png"
+    },
+    {
+      "id": "corporate-order",
+      "name": "Corporate Orders",
+      "description": "Custom enquiries for your team, brand or event.",
+      "image": "assets/corporate-order.jpg"
     }
   ],
   "products": [
@@ -89,8 +83,7 @@ window.KEYDIFY = {
       "name": "Clicky Name Keyring",
       "category": "clicky",
       "categories": [
-        "personalised",
-        "originals"
+        "personalised"
       ],
       "description": "Colourful keycap-style name keyrings. Share your name, preferred colours and any symbol you would like, and we’ll confirm your design in chat.",
       "price": "৳1",
@@ -103,8 +96,7 @@ window.KEYDIFY = {
       "name": "Personalised NFC Keyring",
       "category": "nfc",
       "categories": [
-        "personalised",
-        "originals"
+        "personalised"
       ],
       "description": "A personalised NFC keyring with your name and social design. Tell us the link you want to use and ask us about setup and device compatibility before ordering.",
       "price": "Ask for a quote",
@@ -115,8 +107,7 @@ window.KEYDIFY = {
       "name": "Spooky at Night Keyring",
       "category": "spooky",
       "categories": [
-        "personalised",
-        "originals"
+        "personalised"
       ],
       "description": "A personalised name keyring with glow details, stars and hearts. Tell us your name and preferred colours; we’ll confirm the available designs in chat.",
       "price": "Ask for a quote",
@@ -160,7 +151,7 @@ window.KEYDIFY = {
     {
       "id": "originals-01",
       "name": "Everyday Name Keyrings",
-      "category": "originals",
+      "category": "personalised",
       "description": "Personalised name designs with hearts, stars or floral details. Tell us which design and colours you would like.",
       "price": "Ask for a quote",
       "image": "assets/everyday-originals.jpeg"

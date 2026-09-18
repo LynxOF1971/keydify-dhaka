@@ -5,7 +5,7 @@
   const hero = document.querySelector('.hero');
   const brand = document.querySelector('.brand-break');
   const contact = document.querySelector('.contact');
-  const productGrid = document.querySelector('#product-grid');
+  const productGrid = document.querySelector('#filters');
   const progress = document.createElement('div');
   progress.className = 'scroll-progress'; progress.setAttribute('aria-hidden', 'true');
   document.body.append(progress);
