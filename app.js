@@ -46,7 +46,7 @@ config.categories.forEach(category => {
   $('#filters').append(button);
 });
 function openCategory(category) {
-  const products = config.products.filter(p => p.category === category.id || p.categories?.includes(category.id));
+  const products = config.products.filter(p => p.category === category.id);
   $('#category-title').textContent = category.name;
   $('#category-description').textContent = category.description;
   $('#category-count').textContent = `${products.length} ${products.length === 1 ? 'design' : 'designs'} — choose an image to order`;
@@ -64,7 +64,7 @@ categoryDialog.addEventListener('click', event => {
 function openOrder(product) {
   selectedProduct = product;
   const gallery = $('#order-gallery'); gallery.replaceChildren();
-  const related = [product, ...config.products.filter(p => p.id !== product.id && (p.category === product.category || p.categories?.includes(product.category)))];
+  const related = [product, ...config.products.filter(p => p.id !== product.id && p.category === product.category)];
   const seen = new Set();
   related.forEach(design => [design.image, ...(design.images || [])].filter(Boolean).forEach((src, index) => {
     const key = design.id + src; if (seen.has(key)) return; seen.add(key);
