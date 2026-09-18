@@ -2,9 +2,10 @@
 const $ = s => document.querySelector(s);
 const clone = x => JSON.parse(JSON.stringify(x));
 const repo = 'LynxOF1971/keydify-dhaka';
-const titles = { products: ['Products', 'Add designs, set prices, and choose their photos and categories.'], categories: ['Categories', 'Organise your collections. Each category opens its related designs.'], slides: ['Showcase', 'Choose the designs shown in the rotating product slideshow.'], content: ['Page content', 'Edit your cover, page images, wording, delivery charges and policies.'], settings: ['Contact & settings', 'Choose where your customers can reach you.'], publish: ['Publish & backups', 'Save your changes to GitHub and update the live store.'] };
+const titles = { products: ['Products', 'Add designs and choose their photos and categories.'], categories: ['Categories', 'Organise your collections. Each category opens its related designs.'], slides: ['Showcase', 'Choose the designs shown in the rotating product slideshow.'], content: ['Page content', 'Edit your cover, page images, wording, delivery charges and policies.'], settings: ['Contact & settings', 'Choose where your customers can reach you.'], publish: ['Publish & backups', 'Save your changes to GitHub and update the live store.'] };
 let data = clone(window.KEYDIFY), baseline = clone(data), assets = {}, tab = 'products', token = '', connected = false, dirty = false, busy = false, db, saveTimer, template;
 let previewURLs = [];
+let uploading = 0;
 function el(tag, text, cls) { const node = document.createElement(tag); if (text != null) node.textContent = text; if (cls) node.className = cls; return node; }
 function button(text, fn, cls = '') { const node = el('button', text, cls); node.type = 'button'; node.onclick = fn; return node; }
 function message(text) { $('#status').textContent = text; }
@@ -27,7 +28,7 @@ async function save() {
   if (!db) { $('#save-state').textContent = 'Draft not saved. Download a backup before closing.'; return; }
   try {
     await new Promise((resolve, reject) => { const tx = db.transaction('draft', 'readwrite'); tx.objectStore('draft').put({ data: clone(data), baseline, assets, dirty }, 'current'); tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error); });
-    $('#save-state').textContent = dirty ? 'Draft saved on this device · Unpublished' : 'Up to date · No unpublished edits';
+    $('#save-state').textContent = dirty ? 'Draft saved on this device · Unpublished' : 'Draft matches last loaded or published version';
   } catch { $('#save-state').textContent = 'Storage full or unavailable. Download a backup to keep your draft.'; }
 }
 async function ask(text) { const dialog=document.createElement('dialog');dialog.className='confirm-dialog';const description=el('p',text);const actions=el('div',null,'actions');dialog.append(description,actions);document.body.append(dialog);return new Promise(resolve=>{const done=value=>{dialog.close();dialog.remove();resolve(value);};actions.append(button('Cancel',()=>done(false)),button('Continue',()=>done(true),'primary'));dialog.addEventListener('cancel',event=>{event.preventDefault();done(false);});dialog.showModal();}); }
@@ -35,22 +36,23 @@ function mediaURL(path) { return assets[path]?.url || path; }
 function upload(parent, title, set, video = false, multiple = false) {
   const label = el('label', title, 'upload'), input = document.createElement('input'); input.type = 'file'; input.accept = video ? 'video/mp4,video/webm' : 'image/png,image/jpeg,image/webp,image/gif'; input.multiple = multiple; input.setAttribute('aria-label', title);
   input.onchange = async () => {
+    uploading++; $('#preview').disabled = true;
     try {
       for (const file of input.files) {
         if (file.size > 25 * 1024 * 1024) throw new Error('Please choose a file smaller than 25 MB.');
         if (!(video ? /^video\/(mp4|webm)$/ : /^image\/(png|jpeg|webp|gif)$/).test(file.type)) throw new Error('Choose a supported image or video file.');
         const url = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });
         const ext = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif', 'video/mp4': 'mp4', 'video/webm': 'webm' }[file.type];
-        const path = `assets/upload-${crypto.randomUUID()}.${ext}`; assets[path] = { url, name: file.name }; set(path);
+        const path = `assets/upload-${crypto.randomUUID()}.${ext}`; assets[path] = { url, name: file.name }; set(path); changed();
       }
       changed(); render();
-    } catch (e) { error(e); }
+    } catch (e) { error(e); } finally { uploading--; $('#preview').disabled = busy || uploading > 0; await save(); }
   }; label.append(input); parent.append(label);
 }
-function imageField(parent, object, key, title = 'Image') {
+function imageField(parent, object, key, title = 'Image', update = value => object[key] = value) {
   if (object[key]) { const img = el('img', null, 'thumb'); img.src = mediaURL(object[key]); img.alt = title; parent.append(img); }
-  field(parent, `${title} URL or asset path`, object[key], v => object[key] = v);
-  upload(parent, `Upload ${title.toLowerCase()}`, path => object[key] = path);
+  field(parent, `${title} URL or asset path`, object[key], update);
+  upload(parent, `Upload ${title.toLowerCase()}`, update);
 }
 function reorder(list, index, delta) { if (list[index + delta]) { [list[index], list[index + delta]] = [list[index + delta], list[index]]; changed(); render(); } }
 function controls(parent, list, index, remove) {
@@ -71,16 +73,15 @@ function renderProducts(root) {
     const card = el('article', null, 'card'); card.append(el('h2', p.name)); controls(card, data.products, i, () => removeProduct(p));
     field(card, 'Product name', p.name, v => p.name = v);
     choice(card, 'Category', p.category, [['', 'Choose category'], ...data.categories.map(c => [c.id, c.name])], v => p.category = v);
-    const details = el('details'); details.append(el('summary', 'Also show in other categories'));
-    data.categories.forEach(c => { const label = el('label', c.name, 'check'), box = document.createElement('input'); box.type = 'checkbox'; box.checked = p.categories?.includes(c.id) || false; box.onchange = () => { p.categories = (p.categories || []).filter(id => id !== c.id); if (box.checked) p.categories.push(c.id); changed(); }; label.prepend(box); details.append(label); }); card.append(details);
     field(card, 'Description', p.description, v => p.description = v, 'textarea');
-    const row = el('div', null, 'row');
-    field(row, 'Price in BDT (blank = quote)', p.priceAmount, v => { if (v === '') { delete p.priceAmount; p.price = 'Ask for a quote'; } else { p.priceAmount = Number(v); p.price = `৳${v}`; } }, 'number');
-    field(row, 'Popularity score (higher = first)', p.popularity, v => { if (v === '') delete p.popularity; else p.popularity = Number(v); }, 'number'); card.append(row);
-    imageField(card, p, 'image', 'Product image');
-    const photos = el('details'); photos.append(el('summary', 'More product photos'));
+    imageField(card, p, 'image', 'Product image', value => {
+      const old = p.image; p.image = value;
+      data.slides.forEach(slide => { if (slide.productId === p.id && slide.type === 'image' && slide.src === old) slide.src = value; });
+    });
+    card.append(el('p', 'This design and its extra photos appear only in the category selected above. Matching showcase photos update with the main product image.', 'help'));
+    const photos = el('details'); photos.append(el('summary', 'Category gallery photos'));
     (p.images || []).forEach((src, n) => { const line = el('div', null, 'photo-row'), img = el('img'); img.src = mediaURL(src); img.alt = `${p.name} photo ${n+1}`; line.append(img); field(line, `Photo ${n+1}`, src, v => p.images[n] = v); line.append(button('Remove', () => { p.images.splice(n, 1); changed(); render(); }, 'small')); photos.append(line); });
-    upload(photos, 'Upload more product photos', path => (p.images ||= []).push(path), false, true); card.append(photos); cards.append(card);
+    upload(photos, 'Add photos to this category gallery', path => (p.images ||= []).push(path), false, true); card.append(photos); cards.append(card);
   }); root.append(cards);
 }
 function renderCategories(root) {
@@ -90,7 +91,7 @@ function renderCategories(root) {
     const card = el('article', null, 'card'); card.append(el('h2', c.name));
     controls(card, data.categories, i, async () => {
       const count = data.products.filter(p => p.category === c.id || p.categories?.includes(c.id)).length;
-      if (!await ask(`Delete “${c.name}” from the draft? ${count} related products will remain in All designs. You can assign them to another category.`)) return;
+      if (!await ask(`Delete “${c.name}” from the draft? ${count} related products will remain in Studio but will be hidden from category galleries until you assign them to another category.`)) return;
       data.categories.splice(i,1); data.products.forEach(p => { if (p.category === c.id) p.category = ''; p.categories = (p.categories || []).filter(id => id !== c.id); }); changed(); render();
     });
     field(card, 'Category name', c.name, v => c.name = v); field(card, 'Category description', c.description, v => c.description = v, 'textarea'); imageField(card,c,'image','Category image'); cards.append(card);
@@ -103,7 +104,7 @@ function renderSlides(root) {
   data.slides.forEach((s,i) => { const card=el('article',null,'card'); card.append(el('h2',`Slide ${i+1}`)); controls(card,data.slides,i,()=>{data.slides.splice(i,1);changed();render();});
     choice(card,'Media type',s.type,[['image','Image'],['video','Video']],v=>{s.type=v;changed();render();});
     field(card,'Slide label',s.label,v=>s.label=v); field(card,'Image description',s.alt,v=>s.alt=v);
-    choice(card,'Product to order',s.productId || '',[['','Explore all designs'],...data.products.map(p=>[p.id,p.name])],v=>s.productId=v);
+    choice(card,'Product to order',s.productId || '',[['','Explore categories'],...data.products.map(p=>[p.id,p.name])],v=>s.productId=v);
     if(s.type==='video'){field(card,'Video URL or asset path',s.src,v=>s.src=v);upload(card,'Upload slide video',path=>s.src=path,true);}else imageField(card,s,'src','Slide image'); cards.append(card);
   });root.append(cards);
 }
@@ -147,7 +148,7 @@ function validate(value){
   if(!value || !Array.isArray(value.products)||!Array.isArray(value.categories)||!Array.isArray(value.slides))throw new Error('Invalid store data. Products, categories and slides are required.');
   for(const list of [value.products,value.categories]){const ids=new Set();for(const item of list){if(!item.id || ids.has(item.id)||!item.name?.trim())throw new Error('Every product and category needs a name and a unique ID.');ids.add(item.id);}}
   const ids=new Set(value.categories.map(c=>c.id));const products=new Set(value.products.map(p=>p.id));
-  for(const p of value.products){if(p.category && !ids.has(p.category) || (p.categories||[]).some(id=>!ids.has(id)))throw new Error(`Choose an existing category for ${p.name}.`);for(const key of ['priceAmount','popularity'])if(p[key]!=null && (typeof p[key]!=='number'||!Number.isFinite(p[key])||p[key]<0))throw new Error(`Enter a valid ${key} for ${p.name}.`);if(!p.image)throw new Error(`Add an image for ${p.name}.`);}
+  for(const p of value.products){if(!ids.has(p.category))throw new Error(`Choose an existing category for ${p.name}.`);if(!p.image)throw new Error(`Add an image for ${p.name}.`);}
   for(const s of value.slides){if(!['image','video'].includes(s.type)||!s.src)throw new Error('Every showcase slide needs an image or video.');if(s.productId&&!products.has(s.productId))throw new Error('A slideshow product no longer exists. Select another product.');}
   if(Object.keys(value.site?.text||{}).some(key=>!textFields.some(field=>field[1]===key))||Object.keys(value.site?.media||{}).some(key=>!mediaFields.some(field=>field[1]===key)))throw new Error('This backup has unsupported page fields.');
   const media=[...value.products.flatMap(p=>[p.image,...(p.images||[])]),...value.categories.map(c=>c.image||''),...value.slides.map(s=>s.src),...Object.values(value.site?.media||{})];if(media.some(v=>!validMedia(v)))throw new Error('Use an uploaded asset or an HTTPS link for each image and video.');
@@ -155,10 +156,14 @@ function validate(value){
 }
 async function publish(){
   if(busy)return;try{
-    const next=validate(clone(data));if(!connected||!token)throw new Error('Connect GitHub first.');
+    if(uploading)throw new Error('Please wait for your photos or videos to finish loading.');
+    let next=validate(clone(data));if(!connected||!token)throw new Error('Connect GitHub first.');
     if(!await ask('Publish this draft to your live KeyDify website?'))return;
     busy=true;render();message('Checking the latest version on GitHub…');
-    const remote=await latest();if(JSON.stringify(remote.data)!==JSON.stringify(baseline))throw new Error('The store was updated elsewhere. Download a backup of your draft, then use Load latest from GitHub before editing again. Nothing has been overwritten.');
+    const remote=await latest();
+    const merged=window.KeydifyDraft.merge(baseline,next,remote.data);
+    if(merged.conflicts.length)throw new Error(`The same fields changed both here and on the website: ${merged.conflicts.join(', ')}. Your draft is safe. Download a draft backup before loading the latest GitHub version and reapplying these edits.`);
+    next=validate(merged.data);
     const commit=await api(`git/commits/${remote.head}`),tree=[];
     const serialized=JSON.stringify(next);let n=0;const pending=Object.entries(assets).filter(([path])=>serialized.includes(path));
     for(const [path,asset] of pending){message(`Uploading image/video ${++n} of ${pending.length}…`);const blob=await api('git/blobs','POST',{content:asset.url.split(',')[1],encoding:'base64'});tree.push({path,mode:'100644',type:'blob',sha:blob.sha});}
@@ -177,17 +182,22 @@ function renderPublish(root){
   if(!connected){const input=field(panel,'GitHub access token','',()=>{},'password');input.autocomplete='off';input.oninput=null;
     panel.append(button('Connect GitHub',async()=>{try{token=input.value.trim();input.value='';if(!token)throw new Error('Enter your GitHub token.');const result=await api('');if(!result.permissions?.push)throw new Error('This account cannot update this repository.');connected=true;message('GitHub connected. Review your draft, then publish.');render();}catch(e){token='';error(e);}},'primary'));
   }else{panel.append(el('p','GitHub connected ✓'));panel.append(button('Disconnect',()=>{token='';connected=false;render();}));}
-  const actions=el('div',null,'actions');const pub=button(busy?'Publishing…':'Publish changes',publish,'primary');pub.disabled=busy||!connected;actions.append(pub,button('Load latest from GitHub',async()=>{if(!await ask('Replace this device’s draft with the latest GitHub version? Download a backup first if you want to keep your edits.'))return;try{const remote=await latest();data=remote.data;baseline=clone(data);assets={};dirty=false;await save();message('Latest GitHub content loaded.');render();}catch(e){error(e);}}));panel.append(actions);const build=el('a','Check publishing status on GitHub ↗');build.href=`https://github.com/${repo}/actions`;build.target='_blank';build.rel='noopener';panel.append(build);root.append(panel);
+  const actions=el('div',null,'actions');actions.append(button('Check live website',async()=>{try{const response=await fetch(`config.js?verify=${Date.now()}`,{cache:'no-store'});if(!response.ok)throw new Error('Could not check the live website. Try again.');const live=parseConfig(await response.text());message(JSON.stringify(live)===JSON.stringify(data)?'Verified: the live website has all changes in this draft.':'The live website differs from this draft. Publish any unpublished edits, or wait for GitHub Pages to finish deploying and check again.');}catch(e){error(e);}}));const pub=button(busy?'Publishing…':'Publish changes',publish,'primary');pub.disabled=busy||!connected||uploading>0;actions.append(pub,button('Load latest from GitHub',async()=>{if(!await ask('Replace this device’s draft with the latest GitHub version? Download a backup first if you want to keep your edits.'))return;try{const remote=await latest();data=remote.data;baseline=clone(data);assets={};dirty=false;await save();message('Latest GitHub content loaded.');render();}catch(e){error(e);}}));panel.append(actions);const build=el('a','Check publishing status on GitHub ↗');build.href=`https://github.com/${repo}/actions`;build.target='_blank';build.rel='noopener';panel.append(build);root.append(panel);
   const backup=el('div',null,'panel');backup.append(el('h2','Backups'),el('p','Download your content and any new uploads before switching devices. Existing website images remain in your GitHub repository.','help'),button('Download draft backup',download));
   const label=el('label','Restore backup'),input=document.createElement('input');input.type='file';input.accept='application/json,.json';input.onchange=async()=>{try{const value=JSON.parse(await input.files[0].text());validate(clone(value.data));if(!await ask('Replace the current draft with this backup?'))return;data=value.data;baseline=value.baseline||clone(window.KEYDIFY);assets=value.assets||{};changed();render();message('Backup restored as a draft. Preview before publishing.');}catch(e){error(e);}};label.append(input);backup.append(label);root.append(backup);
 }
-function render(){const root=$('#editor');root.replaceChildren();$('#page-title').textContent=titles[tab][0];$('#page-help').textContent=titles[tab][1];document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));({products:renderProducts,categories:renderCategories,slides:renderSlides,content:renderContent,settings:renderSettings,publish:renderPublish})[tab](root); if(busy)root.querySelectorAll('button,input,textarea,select').forEach(node=>node.disabled=true);$('#preview').disabled=busy;}
+function render(){const root=$('#editor');root.replaceChildren();$('#page-title').textContent=titles[tab][0];$('#page-help').textContent=titles[tab][1];document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));({products:renderProducts,categories:renderCategories,slides:renderSlides,content:renderContent,settings:renderSettings,publish:renderPublish})[tab](root); if(busy)root.querySelectorAll('button,input,textarea,select').forEach(node=>node.disabled=true);$('#preview').disabled=busy||uploading>0;}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{if(busy)return;tab=b.dataset.tab;message('');render();});
-$('#preview').onclick=()=>{try{const draft=validate(clone(data));previewURLs.forEach(url=>URL.revokeObjectURL(url));previewURLs=[];let serialized=JSON.stringify(draft);for(const [path,asset] of Object.entries(assets)){const [head,base64]=asset.url.split(',');const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));const url=URL.createObjectURL(new Blob([bytes],{type:head.split(':')[1].split(';')[0]}));previewURLs.push(url);serialized=serialized.split(path).join(url);}sessionStorage.setItem('keydify-preview',serialized);$('#preview-frame').src=`index.html?preview=1&t=${Date.now()}`;$('#preview-dialog').showModal();}catch(e){error(e);}};
+$('#preview').onclick=()=>{try{if(uploading)throw new Error('Please wait for your photos or videos to finish loading.');const draft=validate(clone(data));previewURLs.forEach(url=>URL.revokeObjectURL(url));previewURLs=[];let serialized=JSON.stringify(draft);for(const [path,asset] of Object.entries(assets)){const [head,base64]=asset.url.split(',');const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));const url=URL.createObjectURL(new Blob([bytes],{type:head.split(':')[1].split(';')[0]}));previewURLs.push(url);serialized=serialized.split(path).join(url);}sessionStorage.setItem('keydify-preview',serialized);$('#preview-frame').src=`index.html?preview=1&t=${Date.now()}`;$('#preview-dialog').showModal();}catch(e){error(e);}};
 $('#close-preview').onclick=()=>{$('#preview-dialog').close();$('#preview-frame').src='about:blank';};
-window.addEventListener('beforeunload',event=>{if(busy){event.preventDefault();event.returnValue='';}});
-async function start(){try{const fresh=await fetch(`config.js?fresh=${Date.now()}`,{cache:'no-store'});if(!fresh.ok)throw new Error('Could not load store content. Refresh to try again.');data=parseConfig(await fresh.text());baseline=clone(data);template=new DOMParser().parseFromString(await(await fetch('index.html')).text(),'text/html');
-  try{db=await new Promise((resolve,reject)=>{const req=indexedDB.open('keydify-studio',1);req.onupgradeneeded=()=>req.result.createObjectStore('draft');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});const saved=await new Promise((resolve,reject)=>{const req=db.transaction('draft').objectStore('draft').get('current');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});if(saved?.dirty){data=saved.data;baseline=saved.baseline;assets=saved.assets;dirty=true;}}
+window.addEventListener('beforeunload',event=>{if(busy||uploading){event.preventDefault();event.returnValue='';}});
+async function start(){try{const fresh=await fetch(`config.js?fresh=${Date.now()}`,{cache:'no-store'});if(!fresh.ok)throw new Error('Could not load store content. Refresh to try again.');data=parseConfig(await fresh.text());baseline=clone(data);template=new DOMParser().parseFromString(await(await fetch(`index.html?studio=${Date.now()}`,{cache:'no-store'})).text(),'text/html');
+  try{db=await new Promise((resolve,reject)=>{const req=indexedDB.open('keydify-studio',1);req.onupgradeneeded=()=>req.result.createObjectStore('draft');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});const saved=await new Promise((resolve,reject)=>{const req=db.transaction('draft').objectStore('draft').get('current');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});if(saved?.dirty){
+    const merged=window.KeydifyDraft.merge(saved.baseline,saved.data,data);
+    if(merged.conflicts.length){data=saved.data;baseline=saved.baseline;message('Saved draft restored. Some fields also changed on the website: '+merged.conflicts.join(', ')+'. Download a backup before loading the latest version.');}
+    else{data=merged.data;message('Your saved edits have been restored and combined with the latest website changes.');}
+    assets=saved.assets||{};dirty=true;
+  }}
   catch{message('Browser storage is unavailable. Download a backup before leaving.');}
   render();await save();
 }catch(e){error(e);}}
