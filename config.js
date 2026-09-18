@@ -120,7 +120,11 @@ window.KEYDIFY = {
       "description": "Custom keyrings for your company, team or event. Share your logo, quantity and deadline so we can prepare a quote.",
       "price": "৳60",
       "image": "assets/corporate-order.jpg",
-      "priceAmount": 60
+      "priceAmount": 60,
+      "images": [
+        "assets/upload-61a78356-148c-48f7-b14b-b079a2227ec7.jpg",
+        "assets/upload-0ae5ca3a-0c27-4cbb-9256-65b5ee04a732.jpg"
+      ]
     },
     {
       "id": "personalised-01",
