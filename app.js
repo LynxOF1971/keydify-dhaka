@@ -52,7 +52,7 @@ function renderProductCards(products, container) {
     const nameButton = textElement('button', product.name); nameButton.style.cssText = 'border:0;background:none;padding:0;text-align:left;font-weight:600'; nameButton.addEventListener('click', () => openOrder(product));
     const heading = document.createElement('h3'); heading.append(nameButton);
     info.append(heading, textElement('p', config.categories.find(c => c.id === product.category)?.name || 'Collection'));
-    meta.append(info, textElement('span', product.price)); card.append(visual, meta); container.append(card);
+    meta.append(info); card.append(visual, meta); container.append(card);
   });
 }
 config.categories.forEach(category => {
@@ -92,13 +92,31 @@ categoryDialog.addEventListener('click', event => {
   if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) categoryDialog.close();
 });
 function openOrder(product) {
-  selectedProduct = product; const gallery = $('#order-gallery'); gallery.replaceChildren(); [...new Set([product.galleryImage, product.image, ...(product.images || [])].filter(Boolean))].forEach((src, index) => { const image = document.createElement('img'); image.src = src; image.alt = `${product.name} — photo ${index + 1}`; image.loading = 'lazy'; gallery.append(image); }); $('#order-title').textContent = product.name; $('#order-description').textContent = product.description; $('#order-price').textContent = product.price; $('#order-form').reset(); $('#order-status').textContent = ''; dialog.showModal(); document.body.classList.add('modal-open');
+  selectedProduct = product;
+  const gallery = $('#order-gallery'); gallery.replaceChildren();
+  const related = [product, ...config.products.filter(p => p.id !== product.id && (p.category === product.category || p.categories?.includes(product.category)))];
+  const seen = new Set();
+  related.forEach(design => [design.image, ...(design.images || [])].filter(Boolean).forEach((src, index) => {
+    const key = design.id + src; if (seen.has(key)) return; seen.add(key);
+    const tile = textElement('button', '', 'order-gallery-tile'); tile.type = 'button';
+    tile.setAttribute('aria-label', `Select ${design.name}, photo ${index + 1}`);
+    tile.setAttribute('aria-pressed', String(design.id === product.id && src === (product.galleryImage || product.image)));
+    const image = document.createElement('img'); image.src = src; image.alt = `${design.name} — photo ${index + 1}`; image.loading = 'lazy';
+    tile.append(image, textElement('span', design.name));
+    tile.addEventListener('click', () => {
+      selectedProduct = {...design, galleryImage: src};
+      $('#order-title').textContent = design.name; $('#order-description').textContent = design.description;
+      gallery.querySelectorAll('button').forEach(button => button.setAttribute('aria-pressed', String(button === tile)));
+    }); gallery.append(tile);
+  }));
+  $('#order-title').textContent = product.name; $('#order-description').textContent = product.description;
+  $('#order-form').reset(); $('#order-status').textContent = ''; dialog.showModal(); document.body.classList.add('modal-open');
 }
 $('.close-dialog').addEventListener('click', () => dialog.close());
 dialog.addEventListener('close', () => { if (!categoryDialog.open) document.body.classList.remove('modal-open'); });
 dialog.addEventListener('click', event => { if (event.target === dialog) { const r = dialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) dialog.close(); } });
 function orderMessage() {
-  return `Hi KeyDify Dhaka! I’m interested in ${selectedProduct.name} (${selectedProduct.id}).\nCustomer name: ${$('#customer-name').value.trim()}\nQuantity: ${$('#quantity').value}\n${$('#customisation').value.trim() ? `Personalisation: ${$('#customisation').value.trim()}\n` : ''}Please confirm the available options, total price and delivery.${config.previewMode ? '\nI saw this sample concept on your website.' : ''}`;
+  return `Hi KeyDify Dhaka! I’m interested in ${selectedProduct.name} (${selectedProduct.id}).\n${selectedProduct.galleryImage ? `Selected design photo: ${new URL(selectedProduct.galleryImage, location.href).href}\n` : ''}Customer name: ${$('#customer-name').value.trim()}\nQuantity: ${$('#quantity').value}\n${$('#customisation').value.trim() ? `Personalisation: ${$('#customisation').value.trim()}\n` : ''}Please confirm the available options, total price and delivery.${config.previewMode ? '\nI saw this sample concept on your website.' : ''}`;
 }
 async function copyMessage(message, status) {
   try { await navigator.clipboard.writeText(message); status.textContent = 'Order details copied. Paste them into your chat.'; return true; }
@@ -132,7 +150,7 @@ function showSlide(index) {
   old.replaceWith(media);
   const product = config.products.find(p => p.id === slide.productId);
   $('#showcase-name').textContent = product?.name || slide.label;
-  $('#showcase-price').textContent = product?.price || '';
+  
   $('#showcase-product').setAttribute('aria-label', product ? `View details and order ${product.name}` : 'Explore the collection'); $('#slide-label').textContent = slide.label; $('.slide-progress span').style.width = `${((slideIndex + 1) / slides.length) * 100}%`;
 }
 function updatePause() { $('#pause-slide').textContent = paused ? '▶' : 'Ⅱ'; $('#pause-slide').setAttribute('aria-label', paused ? 'Play slideshow' : 'Pause slideshow'); const video = $('.showcase-media>video'); if (video) { if (paused) video.pause(); else video.play().catch(() => {}); } }

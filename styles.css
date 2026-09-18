@@ -39,3 +39,13 @@
 .collection .product-meta,#category-dialog .product-meta{display:block;padding:14px 0 18px}.product-meta h3{font-size:17px;line-height:1.35}.product-meta>span{display:block;margin-top:10px;font-size:14px;font-weight:600}
 @media(max-width:1100px){.category-card-grid,.collection .product-grid,#category-dialog .product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){.category-card-grid,.collection .product-grid,#category-dialog .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 12px}.category-card-details strong{font-size:17px}.category-card-details>span{font-size:12px}.product-meta h3{font-size:15px}.category-card-arrow,.product-order-arrow{width:30px;height:30px;font-size:21px;right:8px;bottom:8px}#category-dialog{padding:36px 16px}.product-meta>span{font-size:13px}}
+
+/* Four-column design picker inside the order popup. */
+#order-dialog{width:min(1120px,calc(100% - 24px))}
+#order-gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;overflow:visible;scroll-snap-type:none}
+#order-gallery .order-gallery-tile{min-width:0;padding:6px;border:2px solid transparent;border-radius:8px;background:#e5e0d8;color:var(--ink);text-align:left}
+#order-gallery .order-gallery-tile[aria-pressed=true]{border-color:var(--blue);background:#dbe7ee}
+#order-gallery img{display:block;width:100%;height:auto;aspect-ratio:1;max-height:none;object-fit:contain;border-radius:4px}
+.order-gallery-tile span{display:block;font-size:12px;line-height:1.4;padding:8px 2px}
+#order-dialog #order-form{max-width:640px}
+@media(max-width:600px){#order-dialog{padding:38px 14px 24px}#order-gallery{gap:6px}.order-gallery-tile span{font-size:10px;overflow-wrap:anywhere}#order-gallery .order-gallery-tile{padding:3px}#order-dialog h2{font-size:28px}}
