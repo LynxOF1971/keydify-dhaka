@@ -1,6 +1,6 @@
 /* Edited in KeyDify Studio */
 window.KEYDIFY = {
-  "whatsapp": "8801128110824",
+  "whatsapp": "601128110824",
   "messenger": "keydify.dhaka",
   "previewMode": false,
   "slides": [
