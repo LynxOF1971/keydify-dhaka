@@ -133,3 +133,8 @@ $('#showcase-product').addEventListener('click', () => {
   else $('#collection').scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth' });
 });
 showSlide(0); updatePause();
+
+// Shareable product links open the corresponding order details on arrival.
+const linkedProductId = new URLSearchParams(location.search).get('product');
+const linkedProduct = config.products.find(product => product.id === linkedProductId);
+if (linkedProduct) openOrder(linkedProduct);
