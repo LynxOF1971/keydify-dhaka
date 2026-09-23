@@ -170,7 +170,10 @@ window.KEYDIFY = {
     }
   ],
   "site": {
-    "text": {},
+    "text": {
+      ".delivery-table tbody tr:nth-child(1) td": "৳50",
+      ".delivery-table tbody tr:nth-child(3) td": "৳100"
+    },
     "media": {}
   }
 };
