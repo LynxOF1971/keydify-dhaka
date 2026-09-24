@@ -124,6 +124,7 @@ const textFields = [
 textFields.find(x=>x[0]==='Refund terms')[1]='.refund-content .policy-block:nth-child(4) p';
 textFields.find(x=>x[0]==='Return and redelivery terms')[1]='.refund-content .policy-block:nth-child(5) p:first-of-type';
 textFields.find(x=>x[0]==='Redelivery charge')[1]='.refund-content .policy-block:nth-child(5) p:last-of-type';
+textFields.push(['Discounted product policy','#discount-policy']);
 const mediaFields=[['Cover image','.brand-cover>img'],['Cover video','#cover-video'],['Brand artwork','.brand-break>img'],['Delivery illustration','.delivery-art img'],['Refund illustration','.refund-art img']];
 function renderContent(root){
   data.site ||= {};data.site.text ||= {};data.site.media ||= {};
