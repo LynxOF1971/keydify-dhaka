@@ -196,6 +196,16 @@ window.KEYDIFY = {
         "assets/upload-0b367600-7615-4b49-abe8-d91f760aa3a4.jpg"
       ],
       "visible": true
+    },
+    {
+      "id": "client-9772da17",
+      "name": "Wave Lifestyle",
+      "logo": "assets/upload-3f5e9a8d-2fa9-4f46-a241-5391acc1f3cd.jpg",
+      "description": "WAVE Lifestyle BD is an emerging activewear and performance footwear brand based in Dhaka, Bangladesh. They specialize in authentic athletic shoes, sportswear, and outdoor gear tailored for fitness enthusiasts, runners, and everyday active individuals.",
+      "images": [
+        "assets/upload-7e59246f-bee8-4325-9365-facf79fc9178.jpg"
+      ],
+      "visible": true
     }
   ]
 };
