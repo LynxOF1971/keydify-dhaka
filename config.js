@@ -186,6 +186,16 @@ window.KEYDIFY = {
         "assets/corporate-order.jpg"
       ],
       "visible": true
+    },
+    {
+      "id": "client-2123a2db",
+      "name": "KINZ",
+      "logo": "assets/upload-90e70999-661d-4968-a9ac-ea9d1a4ed068.jpg",
+      "description": "Kinz Moto is a premium automotive showroom and dealership located in Dhaka, Bangladesh. Despite the \"Moto\" in their name, their primary business revolves around the import, sales, and comprehensive servicing of high-end reconditioned and hybrid cars",
+      "images": [
+        "assets/upload-0b367600-7615-4b49-abe8-d91f760aa3a4.jpg"
+      ],
+      "visible": true
     }
   ]
 };
