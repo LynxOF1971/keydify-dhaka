@@ -102,6 +102,7 @@ function handoff(channel, message, status) {
   if (channel === 'messenger' && selectedProduct) {
     copyMessage(message, status); status.textContent = 'Messenger opens in a new tab. Copy your order details and paste them into the chat.';
   }
+  if (selectedProduct) window.KeydifyStats?.track(channel);
   const opened = window.open(url, '_blank', 'noopener,noreferrer');
   if (channel === 'whatsapp') status.textContent = 'WhatsApp opens with your order details ready. Review and send the message to continue.';
 }

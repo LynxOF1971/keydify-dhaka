@@ -2,7 +2,7 @@
 const $ = s => document.querySelector(s);
 const clone = x => JSON.parse(JSON.stringify(x));
 const repo = 'LynxOF1971/keydify-dhaka';
-const titles = { products: ['Products', 'Add designs and choose their photos and categories.'], categories: ['Categories', 'Organise your collections. Each category opens its related designs.'], slides: ['Showcase', 'Choose the designs shown in the rotating product slideshow.'], content: ['Page content', 'Edit your cover, page images, wording, delivery charges and policies.'], settings: ['Contact & settings', 'Choose where your customers can reach you.'], publish: ['Publish & backups', 'Save your changes to GitHub and update the live store.'] };
+const titles = { clients: ['Trusted clients', 'Show client names and logos on your website.'], analytics: ['Live counters', 'Shared totals from your public websites.'], products: ['Products', 'Add designs and choose their photos and categories.'], categories: ['Categories', 'Organise your collections. Each category opens its related designs.'], slides: ['Showcase', 'Choose the designs shown in the rotating product slideshow.'], content: ['Page content', 'Edit your cover, page images, wording, delivery charges and policies.'], settings: ['Contact & settings', 'Choose where your customers can reach you.'], publish: ['Publish & backups', 'Save your changes to GitHub and update the live store.'] };
 let data = clone(window.KEYDIFY), baseline = clone(data), assets = {}, tab = 'products', token = '', connected = false, dirty = false, busy = false, db, saveTimer, template;
 let previewURLs = [];
 let uploading = 0;
@@ -137,6 +137,28 @@ function renderContent(root){
 }
 function normalizeWhatsApp(v){let number=v.replace(/\D/g,'');if(number.startsWith('00'))number=number.slice(2);else if(/^01\d{8,9}$/.test(number))number='60'+number.slice(1);return number;}
 function normalizeMessenger(v){v=v.trim();if(/^https:\/\//i.test(v)){try{const url=new URL(v);if(['facebook.com','www.facebook.com','m.me','www.messenger.com','messenger.com'].includes(url.hostname)){const parts=url.pathname.split('/').filter(Boolean);return parts[0]==='t'?parts[1] || '':parts[0] || '';}}catch{}}return v;}
+function renderClients(root) {
+  data.clients ||= [];
+  root.append(el('p', 'Add your real clients and their logos. The website shows this section once at least one client with a name and logo is published.', 'notice'));
+  root.append(button('+ Add client', () => { data.clients.push({ id: 'client-' + crypto.randomUUID().slice(0,8), name: '', logo: '', visible: true }); changed(); render(); }, 'primary'));
+  const cards = el('div', null, 'cards');
+  data.clients.forEach((client, index) => {
+    const card = el('article', null, 'card'); card.append(el('h2', client.name || 'New client'));
+    controls(card, data.clients, index, async () => { if (await ask('Remove this client from your draft?')) { data.clients.splice(index, 1); changed(); render(); } });
+    field(card, 'Client name', client.name, value => client.name = value);
+    imageField(card, client, 'logo', 'Client logo');
+    choice(card, 'Display on website', client.visible === false ? 'hidden' : 'visible', [['visible','Visible'],['hidden','Hidden']], value => client.visible = value === 'visible');
+    cards.append(card);
+  }); root.append(cards);
+}
+function renderAnalytics(root) {
+  const panel = el('div', null, 'panel'); panel.append(el('h2', 'Live website activity'));
+  const totals = el('div'); panel.append(totals); window.KeydifyStats.panel(totals);
+  const status = el('p', 'Loading totals…', 'help'); panel.append(status);
+  async function refresh() { try { const stats = await window.KeydifyStats.read(); window.KeydifyStats.paint(totals, stats); status.textContent = 'Updated ' + new Date().toLocaleString(); } catch(e) { status.textContent = e.message; } }
+  panel.append(button('Refresh totals', refresh), el('p', 'Visits count each storefront page opening (including refreshes), not unique people. WhatsApp and Messenger enquiries count valid order-form Continue clicks; they are not confirmed purchases. Studio, local tests and draft previews do not add visits. Totals begin when tracking is launched and are shared across keydify.com, www.keydify.com and the GitHub website.', 'analytics-note'));
+  root.append(panel); refresh();
+}
 function renderSettings(root){const panel=el('div',null,'panel');panel.append(el('h2','Customer contact'));field(panel,'WhatsApp number',data.whatsapp,v=>data.whatsapp=v);panel.append(el('p','Use +601128110824. Malaysian local numbers such as 01128110824 are converted to +60 by removing the leading 0. For another country, enter the full international number with its country code.','help'));field(panel,'Messenger username or Facebook page URL',data.messenger,v=>data.messenger=v);panel.append(el('p','Example: https://www.facebook.com/keydify.dhaka/','help'));data.site ||= {};field(panel,'Browser tab title',data.site.title ?? template.title,v=>data.site.title=v);field(panel,'Search description',data.site.description ?? template.querySelector('meta[name="description"]').content,v=>data.site.description=v,'textarea');root.append(panel);}
 async function api(path,method='GET',body){const response=await fetch(`https://api.github.com/repos/${repo}${path ? "/"+path : ""}`,{method,headers:{Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',...(token?{Authorization:`Bearer ${token}`}:{})},...(body?{body:JSON.stringify(body)}:{})});if(!response.ok){const info=await response.json().catch(()=>({}));throw new Error(`GitHub ${response.status}: ${info.message || 'Request failed'}. Your draft is still saved.`);}return response.json();}
 function parseConfig(source){const match=source.match(/window\.KEYDIFY\s*=\s*([\s\S]*?)\s*;?\s*$/);if(!match)throw new Error('Could not read the store configuration.');return JSON.parse(match[1].replace(/;\s*$/,''));}
@@ -151,6 +173,9 @@ function validate(value){
   for(const p of value.products){if(!ids.has(p.category))throw new Error(`Choose an existing category for ${p.name}.`);if(!p.image)throw new Error(`Add an image for ${p.name}.`);}
   for(const s of value.slides){if(!['image','video'].includes(s.type)||!s.src)throw new Error('Every showcase slide needs an image or video.');if(s.productId&&!products.has(s.productId))throw new Error('A slideshow product no longer exists. Select another product.');}
   if(Object.keys(value.site?.text||{}).some(key=>!textFields.some(field=>field[1]===key))||Object.keys(value.site?.media||{}).some(key=>!mediaFields.some(field=>field[1]===key)))throw new Error('This backup has unsupported page fields.');
+  if (value.clients !== undefined && !Array.isArray(value.clients)) throw new Error('Invalid client list.');
+  const clientIds = new Set();
+  for (const client of value.clients || []) { if (!client.id || clientIds.has(client.id) || !client.name?.trim() || !client.logo || !validMedia(client.logo)) throw new Error('Every client needs a unique ID, name and valid logo.'); clientIds.add(client.id); }
   const media=[...value.products.flatMap(p=>[p.image,...(p.images||[])]),...value.categories.map(c=>c.image||''),...value.slides.map(s=>s.src),...Object.values(value.site?.media||{})];if(media.some(v=>!validMedia(v)))throw new Error('Use an uploaded asset or an HTTPS link for each image and video.');
   value.whatsapp=normalizeWhatsApp(value.whatsapp||'');value.messenger=normalizeMessenger(value.messenger||'');if(!/^\d{7,15}$/.test(value.whatsapp))throw new Error('Enter a valid WhatsApp phone number.');if(!/^[a-zA-Z0-9._-]+$/.test(value.messenger))throw new Error('Enter a valid Messenger username or Facebook page URL.');return value;
 }
@@ -186,7 +211,7 @@ function renderPublish(root){
   const backup=el('div',null,'panel');backup.append(el('h2','Backups'),el('p','Download your content and any new uploads before switching devices. Existing website images remain in your GitHub repository.','help'),button('Download draft backup',download));
   const label=el('label','Restore backup'),input=document.createElement('input');input.type='file';input.accept='application/json,.json';input.onchange=async()=>{try{const value=JSON.parse(await input.files[0].text());validate(clone(value.data));if(!await ask('Replace the current draft with this backup?'))return;data=value.data;baseline=value.baseline||clone(window.KEYDIFY);assets=value.assets||{};changed();render();message('Backup restored as a draft. Preview before publishing.');}catch(e){error(e);}};label.append(input);backup.append(label);root.append(backup);
 }
-function render(){const root=$('#editor');root.replaceChildren();$('#page-title').textContent=titles[tab][0];$('#page-help').textContent=titles[tab][1];document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));({products:renderProducts,categories:renderCategories,slides:renderSlides,content:renderContent,settings:renderSettings,publish:renderPublish})[tab](root); if(busy)root.querySelectorAll('button,input,textarea,select').forEach(node=>node.disabled=true);$('#preview').disabled=busy||uploading>0;}
+function render(){const root=$('#editor');root.replaceChildren();$('#page-title').textContent=titles[tab][0];$('#page-help').textContent=titles[tab][1];document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));({clients:renderClients,analytics:renderAnalytics,products:renderProducts,categories:renderCategories,slides:renderSlides,content:renderContent,settings:renderSettings,publish:renderPublish})[tab](root); if(busy)root.querySelectorAll('button,input,textarea,select').forEach(node=>node.disabled=true);$('#preview').disabled=busy||uploading>0;}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{if(busy)return;tab=b.dataset.tab;message('');render();});
 $('#preview').onclick=()=>{try{if(uploading)throw new Error('Please wait for your photos or videos to finish loading.');const draft=validate(clone(data));previewURLs.forEach(url=>URL.revokeObjectURL(url));previewURLs=[];let serialized=JSON.stringify(draft);for(const [path,asset] of Object.entries(assets)){const [head,base64]=asset.url.split(',');const bytes=Uint8Array.from(atob(base64),c=>c.charCodeAt(0));const url=URL.createObjectURL(new Blob([bytes],{type:head.split(':')[1].split(';')[0]}));previewURLs.push(url);serialized=serialized.split(path).join(url);}sessionStorage.setItem('keydify-preview',serialized);$('#preview-frame').src=`index.html?preview=1&t=${Date.now()}`;$('#preview-dialog').showModal();}catch(e){error(e);}};
 $('#close-preview').onclick=()=>{$('#preview-dialog').close();$('#preview-frame').src='about:blank';};
