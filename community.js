@@ -42,9 +42,33 @@
   const showcase = document.querySelector('#trusted-clients');
   const visible = clients.filter(client => client.name?.trim() && client.logo && client.visible !== false);
   showcase.hidden = !visible.length;
+  const dialog = document.createElement('dialog');
+  dialog.className = 'client-dialog';
+  dialog.setAttribute('aria-labelledby', 'client-dialog-title');
+  const close = document.createElement('button'); close.className = 'client-close'; close.textContent = '×'; close.setAttribute('aria-label', 'Close client gallery');
+  const body = document.createElement('div');
+  dialog.append(close, body); document.body.append(dialog);
+  close.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => { if (event.target === dialog) { const r = dialog.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) dialog.close(); } });
+  function openClient(client) {
+    body.replaceChildren();
+    const logo = document.createElement('img'); logo.className = 'client-dialog-logo'; logo.src = client.logo; logo.alt = `${client.name} logo`;
+    const title = document.createElement('h2'); title.id = 'client-dialog-title'; title.textContent = client.name;
+    const description = document.createElement('p'); description.className = 'client-description'; description.textContent = client.description || '';
+    const heading = document.createElement('h3'); heading.textContent = 'Made by KeyDify for ' + client.name;
+    const gallery = document.createElement('div'); gallery.className = 'client-purchase-gallery';
+    (client.images || []).filter(Boolean).forEach((src, index) => {
+      const image = document.createElement('img'); image.src = src; image.alt = `${client.name} purchased products — photo ${index + 1}`; image.loading = 'lazy'; gallery.append(image);
+    });
+    body.append(logo, title, description);
+    if (gallery.children.length) body.append(heading, gallery);
+    else { const empty = document.createElement('p'); empty.textContent = 'Product photos coming soon.'; body.append(empty); }
+    dialog.showModal();
+  }
   visible.forEach(client => {
-    const card = document.createElement('figure'), image = document.createElement('img'), name = document.createElement('figcaption');
+    const card = document.createElement('button'), image = document.createElement('img'), name = document.createElement('span');
+    card.type = 'button'; card.className = 'client-card'; card.setAttribute('aria-haspopup', 'dialog'); card.setAttribute('aria-label', `View ${client.name} and their purchased products`);
     image.src = client.logo; image.alt = `${client.name} logo`; image.loading = 'lazy';
-    name.textContent = client.name; card.append(image, name); showcase.querySelector('.client-grid').append(card);
+    name.textContent = client.name; card.append(image, name); card.addEventListener('click', () => openClient(client)); showcase.querySelector('.client-grid').append(card);
   });
 })();

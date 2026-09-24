@@ -140,13 +140,23 @@ function normalizeMessenger(v){v=v.trim();if(/^https:\/\//i.test(v)){try{const u
 function renderClients(root) {
   data.clients ||= [];
   root.append(el('p', 'Add your real clients and their logos. The website shows this section once at least one client with a name and logo is published.', 'notice'));
-  root.append(button('+ Add client', () => { data.clients.push({ id: 'client-' + crypto.randomUUID().slice(0,8), name: '', logo: '', visible: true }); changed(); render(); }, 'primary'));
+  root.append(button('+ Add client', () => { data.clients.push({ id: 'client-' + crypto.randomUUID().slice(0,8), name: '', logo: '', description: '', images: [], visible: true }); changed(); render(); }, 'primary'));
   const cards = el('div', null, 'cards');
   data.clients.forEach((client, index) => {
     const card = el('article', null, 'card'); card.append(el('h2', client.name || 'New client'));
     controls(card, data.clients, index, async () => { if (await ask('Remove this client from your draft?')) { data.clients.splice(index, 1); changed(); render(); } });
     field(card, 'Client name', client.name, value => client.name = value);
     imageField(card, client, 'logo', 'Client logo');
+    field(card, 'About this company', client.description || '', value => client.description = value, 'textarea');
+    const photos = el('div'); photos.append(el('h3', 'Purchased product gallery'), el('p', 'These photos appear only when visitors click this company’s logo.', 'help'));
+    (client.images || []).forEach((src, n) => {
+      const line = el('div', null, 'photo-row'), img = el('img'); img.src = mediaURL(src); img.alt = `${client.name} purchase ${n + 1}`; line.append(img);
+      field(line, `Purchase photo ${n + 1}`, src, value => client.images[n] = value);
+      controls(line, client.images, n, () => { client.images.splice(n, 1); changed(); render(); }); photos.append(line);
+    });
+    upload(photos, 'Add purchased product photos', path => (client.images ||= []).push(path), false, true);
+    photos.append(button('+ Add photo URL', () => { (client.images ||= []).push(''); changed(); render(); }, 'small'));
+    card.append(photos);
     choice(card, 'Display on website', client.visible === false ? 'hidden' : 'visible', [['visible','Visible'],['hidden','Hidden']], value => client.visible = value === 'visible');
     cards.append(card);
   }); root.append(cards);
@@ -175,7 +185,7 @@ function validate(value){
   if(Object.keys(value.site?.text||{}).some(key=>!textFields.some(field=>field[1]===key))||Object.keys(value.site?.media||{}).some(key=>!mediaFields.some(field=>field[1]===key)))throw new Error('This backup has unsupported page fields.');
   if (value.clients !== undefined && !Array.isArray(value.clients)) throw new Error('Invalid client list.');
   const clientIds = new Set();
-  for (const client of value.clients || []) { if (!client.id || clientIds.has(client.id) || !client.name?.trim() || !client.logo || !validMedia(client.logo)) throw new Error('Every client needs a unique ID, name and valid logo.'); clientIds.add(client.id); }
+  for (const client of value.clients || []) { if (!client.id || clientIds.has(client.id) || !client.name?.trim() || !client.logo || !validMedia(client.logo)) throw new Error('Every client needs a unique ID, name and valid logo.'); clientIds.add(client.id); if (client.description !== undefined && typeof client.description !== 'string') throw new Error('Client description must be text.'); if (client.images !== undefined && (!Array.isArray(client.images) || client.images.some(src => !src || !validMedia(src)))) throw new Error('Every client gallery photo needs an uploaded asset or HTTPS link.'); }
   const media=[...value.products.flatMap(p=>[p.image,...(p.images||[])]),...value.categories.map(c=>c.image||''),...value.slides.map(s=>s.src),...Object.values(value.site?.media||{})];if(media.some(v=>!validMedia(v)))throw new Error('Use an uploaded asset or an HTTPS link for each image and video.');
   value.whatsapp=normalizeWhatsApp(value.whatsapp||'');value.messenger=normalizeMessenger(value.messenger||'');if(!/^\d{7,15}$/.test(value.whatsapp))throw new Error('Enter a valid WhatsApp phone number.');if(!/^[a-zA-Z0-9._-]+$/.test(value.messenger))throw new Error('Enter a valid Messenger username or Facebook page URL.');return value;
 }

@@ -175,5 +175,17 @@ window.KEYDIFY = {
       ".delivery-table tbody tr:nth-child(3) td": "৳100"
     },
     "media": {}
-  }
+  },
+  "clients": [
+    {
+      "id": "unison-engineers",
+      "name": "Unison Engineers",
+      "logo": "assets/unison-logo.jpg",
+      "description": "Unison Engineers is an interior design company based in Dhaka, with experience in bank interiors and ATM booth projects, including NRB Bank. We created these custom logo keyrings for their team.",
+      "images": [
+        "assets/corporate-order.jpg"
+      ],
+      "visible": true
+    }
+  ]
 };
