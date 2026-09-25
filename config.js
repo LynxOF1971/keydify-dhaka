@@ -206,6 +206,16 @@ window.KEYDIFY = {
         "assets/upload-7e59246f-bee8-4325-9365-facf79fc9178.jpg"
       ],
       "visible": true
+    },
+    {
+      "id": "client-ff6ab995",
+      "name": "BEXIMCO",
+      "logo": "assets/upload-dfe674f4-8438-47ef-b15a-678cfbaa0f87.png",
+      "description": "BEXIMCO is the largest private-sector industrial conglomerate in Bangladesh. The multi-billion-dollar holding group spans critical national industries including pharmaceuticals, textiles, ceramics, real estate, and energy.",
+      "images": [
+        "assets/upload-b4769529-0b73-4ffc-babc-c4a0acac91d8.jpg"
+      ],
+      "visible": true
     }
   ]
 };
