@@ -188,6 +188,27 @@ window.KEYDIFY = {
       "visible": true
     },
     {
+      "id": "client-114da331",
+      "name": "KOICA",
+      "logo": "assets/upload-d1c337e2-0870-4ac4-ae21-4083d8b953e0.webp",
+      "description": "KOICA (Korea International Cooperation Agency) is South Korea’s government agency for international development, established in 1991 to fight poverty and support sustainable growth. In Bangladesh, KOICA recently rolled out a $96 million grant framework focused on tech innovation, education, and rural development.",
+      "images": [
+        "assets/upload-37f9d9e0-058f-4d51-94ab-4e5e33d10bc6.jpg",
+        "assets/upload-fd40a955-0488-48e8-ac4a-cb9bd39c09ec.jpg"
+      ],
+      "visible": true
+    },
+    {
+      "id": "client-ff6ab995",
+      "name": "BEXIMCO",
+      "logo": "assets/upload-dfe674f4-8438-47ef-b15a-678cfbaa0f87.png",
+      "description": "BEXIMCO is the largest private-sector industrial conglomerate in Bangladesh. The multi-billion-dollar holding group spans critical national industries including pharmaceuticals, textiles, ceramics, real estate, and energy.",
+      "images": [
+        "assets/upload-b4769529-0b73-4ffc-babc-c4a0acac91d8.jpg"
+      ],
+      "visible": true
+    },
+    {
       "id": "client-2123a2db",
       "name": "KINZ",
       "logo": "assets/upload-90e70999-661d-4968-a9ac-ea9d1a4ed068.jpg",
@@ -208,23 +229,13 @@ window.KEYDIFY = {
       "visible": true
     },
     {
-      "id": "client-ff6ab995",
-      "name": "BEXIMCO",
-      "logo": "assets/upload-dfe674f4-8438-47ef-b15a-678cfbaa0f87.png",
-      "description": "BEXIMCO is the largest private-sector industrial conglomerate in Bangladesh. The multi-billion-dollar holding group spans critical national industries including pharmaceuticals, textiles, ceramics, real estate, and energy.",
+      "id": "client-e9da3d00",
+      "name": "F1 MOTORS BD",
+      "logo": "assets/upload-c182a45d-23f2-4cae-a355-4ccf28bf6aed.jpg",
+      "description": "AI Mode conversation: koica tell me about them and their recent bd workskoica tell me about them and their recent bd worksKOICA (Korea International Cooperation Agency) is South Korea's primary government agency responsible for official development assistance (ODA). Established in 1991, its mission is to promote sustainable socio-economic development, eradicate poverty, and foster international cooperation across developing nations. Recently, KOICA rolled out a massive $96 million grant framework in Bangladesh spanning advanced technology, human resources, and sustainable rural development.Key Recent Initiatives in BangladeshArtificial Intelligence & Tech Workforce Development: A $13 million grant (2026–2029) with the Bangladesh Hi-Tech Park Authority will establish an AI Hub Centre in Dhaka for specialized training, advanced degrees, and startup incubation.Rural Development (Saemaul Plus): A $39.286 million grant led by the Bangladesh Academy for Rural Development (BARD) aims to boost local governance and sustainable rural economic models.Vocational and Infrastructure Safety Upgrades: A $2 million project (2026–2028) rebuilds facilities at the Bangladesh-Korea Technical Training Center (BKTTC) in Chattogram, with an additional $15 million upgrade proposed for green ship-breaking workforce training.Healthcare & Humanitarian Aid: A $10 million partnership with UNFPA supports adolescent and youth healthcare and sanitation in Rohingya camps and host communities.Digital Infrastructure & Logistics: Ongoing efforts feature a $9.65 million national statistics data warehouse and an $8.85 million smart digital bridge maintenance initiative.Would you like more details on the eligibility criteria for KOICA's tech fellowships, details on how local businesses can participate in the AI Hub incubation programs, or specifics on their rural development timelines?AI can make mistakes, so double-check responses The Business StandardKoica grants $96m to boost Bangladesh's future in advanced tech, AI ...2 Dec 2025 — Koica is further investing $26 million in Bangladesh's technology and digital security sectors through two parallel projects. high...YouTube·KOICA 코이카KOICA's New Employees Share Their Secrets to Success and ...13 Jul 2026 — KOICA, the Korea International Cooperation Agency, is South Korea's leading development cooperation agency. cultural ODA projects.19:45InstagramThe KOICA Bangladesh Office brought together seven partner ...The KOICA Bangladesh Office brought together seven partner ... * koica_bangladesh A Safer Learning Space for BKTTC, Chattogram 🇰...Show allmake it shortKOICA (Korea International Cooperation Agency) is South Korea’s government agency for international development, established in 1991 to fight poverty and support sustainable growth. In Bangladesh, KOICA recently rolled out a $96 million grant framework focused on tech innovation, education, and rural development.Main Recent Projects in BangladeshAI & Tech Development: A $13 million grant to build an AI Hub Centre in Dhaka for tech training and startup incubation.Rural Economy: A $39 million initiative to improve local governance and rural village economies.Vocational Safety: A $2 million upgrade for the technical training center in Chattogram and a proposed $15 million program for green ship-breaking safety.Health & Digital Aid: A $10 million youth healthcare program in Rohingya camps and host communities, alongside investments in a national statistics data warehouse.Would you like to look closer at the AI Hub project timeline, the vocational training programs available, or how local NGOs can partner with them?same for f1 motors bdF1 Motors BD is a trusted automotive trade, rental, and maintenance platform based in Gulshan, Dhaka, Bangladesh. Known for operating as a transparent \"fixed price\" shop, it specializes in sourcing, verifying, and selling reconditioned and pre-owned multi-brand vehicles.",
       "images": [
-        "assets/upload-b4769529-0b73-4ffc-babc-c4a0acac91d8.jpg"
-      ],
-      "visible": true
-    },
-    {
-      "id": "client-114da331",
-      "name": "KOICA",
-      "logo": "assets/upload-d1c337e2-0870-4ac4-ae21-4083d8b953e0.webp",
-      "description": "KOICA (Korea International Cooperation Agency) is South Korea’s government agency for international development, established in 1991 to fight poverty and support sustainable growth. In Bangladesh, KOICA recently rolled out a $96 million grant framework focused on tech innovation, education, and rural development.",
-      "images": [
-        "assets/upload-37f9d9e0-058f-4d51-94ab-4e5e33d10bc6.jpg",
-        "assets/upload-fd40a955-0488-48e8-ac4a-cb9bd39c09ec.jpg"
+        "assets/upload-4dbbc4ed-fb12-4824-96be-055d4227fdf8.jpg",
+        "assets/upload-861ae97a-1eda-4bf3-b07e-dff7cacb5b27.jpg"
       ],
       "visible": true
     }
