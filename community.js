@@ -65,10 +65,37 @@
     else { const empty = document.createElement('p'); empty.textContent = 'Product photos coming soon.'; body.append(empty); }
     dialog.showModal();
   }
-  visible.forEach(client => {
+  const pageSize = 30;
+  let currentPage = 0;
+  const pageCount = Math.ceil(visible.length / pageSize);
+  const grid = showcase.querySelector('.client-grid');
+  grid.id = 'trusted-client-page';
+  const navigation = document.createElement('nav'); navigation.className = 'client-pagination'; navigation.setAttribute('aria-label', 'Trusted company pages');
+  const previous = document.createElement('button'), next = document.createElement('button'), status = document.createElement('span');
+  previous.type = next.type = 'button'; previous.textContent = '←'; next.textContent = '→';
+  previous.setAttribute('aria-label', 'Previous companies'); next.setAttribute('aria-label', 'Next companies');
+  previous.setAttribute('aria-controls', grid.id); next.setAttribute('aria-controls', grid.id);
+  status.setAttribute('role', 'status'); status.setAttribute('aria-live', 'polite');
+  navigation.append(previous, status, next); showcase.append(navigation);
+  function renderClientPage() {
+    grid.replaceChildren();
+    navigation.hidden = pageCount <= 1;
+    previous.disabled = currentPage === 0; next.disabled = currentPage >= pageCount - 1;
+    status.textContent = `Page ${currentPage + 1} of ${pageCount}`;
+    visible.slice(currentPage * pageSize, (currentPage + 1) * pageSize).forEach(client => {
     const card = document.createElement('button'), image = document.createElement('img'), name = document.createElement('span');
     card.type = 'button'; card.className = 'client-card'; card.setAttribute('aria-haspopup', 'dialog'); card.setAttribute('aria-label', `View ${client.name} and their purchased products`);
     image.src = client.logo; image.alt = `${client.name} logo`; image.loading = 'lazy';
-    name.textContent = client.name; card.append(image, name); card.addEventListener('click', () => openClient(client)); showcase.querySelector('.client-grid').append(card);
-  });
+    name.textContent = client.name; card.append(image, name); card.addEventListener('click', () => openClient(client)); grid.append(card);
+    });
+  }
+  function changePage(delta) {
+    currentPage = Math.max(0, Math.min(pageCount - 1, currentPage + delta));
+    renderClientPage();
+    grid.querySelector('button')?.focus({ preventScroll: true });
+    showcase.scrollIntoView({ behavior: 'instant', block: 'start' });
+  }
+  previous.addEventListener('click', () => changePage(-1));
+  next.addEventListener('click', () => changePage(1));
+  renderClientPage();
 })();
