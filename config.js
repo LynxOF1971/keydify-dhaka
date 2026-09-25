@@ -216,6 +216,17 @@ window.KEYDIFY = {
         "assets/upload-b4769529-0b73-4ffc-babc-c4a0acac91d8.jpg"
       ],
       "visible": true
+    },
+    {
+      "id": "client-114da331",
+      "name": "KOICA",
+      "logo": "assets/upload-d1c337e2-0870-4ac4-ae21-4083d8b953e0.webp",
+      "description": "",
+      "images": [
+        "assets/upload-37f9d9e0-058f-4d51-94ab-4e5e33d10bc6.jpg",
+        "assets/upload-fd40a955-0488-48e8-ac4a-cb9bd39c09ec.jpg"
+      ],
+      "visible": true
     }
   ]
 };
